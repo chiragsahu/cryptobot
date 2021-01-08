@@ -1,16 +1,19 @@
 import telebot
 import requests
+import configparser as cfg
 import math
 
-bot = telebot.TeleBot(token='1472008407:AAGHkB_KPARU7DRqiURGdvEDU9mhDuFagi8')
-WAZIRX_LIVE_URL = "https://api.wazirx.com/api/v2/depth"
 
-# cryptos = ["/usdtinr",  "btcinr",  "/ltcinr",  "/xrpinr",
-#           "/dashinr",  "/ethinr",  "/trxinr",  "/eosinr",
-#             "/batinr",  "/wrxinr",  "/maticinr",  "/bchabcinr",
-#           "/bnbinr",  "/bttinr",  "/yfiinr",  "/uniinr",  "/linkinr",
-#           "/sxpinr",  "/adainr",  "/atominr",  "/xlminr",  "/xeminr",
-#             "/zecinr",  "/busdinr",  "/usdtinr"]
+def read_from_config(config):
+    parser = cfg.ConfigParser()
+    parser.read(config)
+    return parser.get('creds', 'bot_token')
+
+
+token = read_from_config('config.cfg')
+
+bot = telebot.TeleBot(token=token)
+WAZIRX_LIVE_URL = "https://api.wazirx.com/api/v2/depth"
 
 cryptos = ["usdtinr",  "btcinr",  "ltcinr",  "xrpinr",  "dashinr",
            "ethinr",  "trxinr",  "eosinr",  "batinr",  "wrxinr",
@@ -54,7 +57,8 @@ def formatOutput(rawData):
             for bid in (rawData[keys]['bids'][:5]):
                 output_buy += '\n| {:.2f} - {:.4f} |'.format(
                     float(bid[0]), float(bid[1]))
-            data[keys] = output.format(dash = '- '*length,ask=output_ask, sell=output_buy)
+            data[keys] = output.format(
+                dash='- '*length, ask=output_ask, sell=output_buy)
         else:
             data[keys] = 'please enter a valid command!'
     return data
@@ -70,7 +74,6 @@ def returnPrice(texts):
         else:
             results[crypto] = {}
             results[crypto]['error'] = 'true'
-        print(results)
     return results
 
 
